@@ -48,7 +48,7 @@ export default function AdminEvents() {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Événements</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Events</h1>
         <button
           onClick={() => setShowForm(!showForm)}
           className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors ${
@@ -57,7 +57,7 @@ export default function AdminEvents() {
               : "bg-wine text-white hover:bg-wine-light"
           }`}
         >
-          {showForm ? "Annuler" : "+ Nouvel événement"}
+          {showForm ? "Cancel" : "+ New event"}
         </button>
       </div>
 
@@ -67,14 +67,14 @@ export default function AdminEvents() {
           className="bg-white border border-cream-dark rounded-2xl p-8 mb-6 space-y-5"
         >
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Titre</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
             <input
               type="text"
               required
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
-              placeholder="Ex: Vins naturels du Jura"
+              placeholder="e.g. Natural wines from Jura"
             />
           </div>
           <div>
@@ -86,13 +86,13 @@ export default function AdminEvents() {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
               rows={2}
-              placeholder="Décrivez l'événement..."
+              placeholder="Describe the event..."
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Date & heure
+                Date & time
               </label>
               <input
                 type="datetime-local"
@@ -103,20 +103,20 @@ export default function AdminEvents() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Lieu</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
               <input
                 type="text"
                 required
                 value={form.location}
                 onChange={(e) => setForm({ ...form, location: e.target.value })}
                 className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
-                placeholder="Adresse ou nom du lieu"
+                placeholder="Address or venue name"
               />
             </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Nombre de places
+              Max guests
             </label>
             <input
               type="number"
@@ -130,7 +130,7 @@ export default function AdminEvents() {
             />
           </div>
           <button className="bg-wine text-white px-8 py-3 rounded-xl font-medium hover:bg-wine-light transition-colors">
-            Créer l&apos;événement
+            Create event
           </button>
         </form>
       )}
@@ -154,11 +154,11 @@ export default function AdminEvents() {
                   <h2 className="font-semibold text-gray-900 group-hover:text-wine transition-colors">
                     {event.title}
                     {isPast && (
-                      <span className="text-gray-400 text-xs font-normal ml-2">(passé)</span>
+                      <span className="text-gray-400 text-xs font-normal ml-2">(past)</span>
                     )}
                   </h2>
                   <p className="text-gray-500 text-sm mt-1">
-                    {new Date(event.date).toLocaleDateString("fr-FR", {
+                    {new Date(event.date).toLocaleDateString("en-US", {
                       weekday: "short",
                       day: "numeric",
                       month: "short",
@@ -175,7 +175,7 @@ export default function AdminEvents() {
                   </p>
                   {event.waitlist.length > 0 && (
                     <p className="text-gold text-xs">
-                      +{event.waitlist.length} en attente
+                      +{event.waitlist.length} waitlisted
                     </p>
                   )}
                 </div>
@@ -185,7 +185,7 @@ export default function AdminEvents() {
         })}
         {events.length === 0 && (
           <div className="text-center py-12 text-gray-400">
-            Aucun événement. Créez-en un !
+            No events yet. Create one!
           </div>
         )}
       </div>

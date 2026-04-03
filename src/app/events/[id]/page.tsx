@@ -32,7 +32,7 @@ export default function EventPage() {
   if (!event)
     return (
       <div className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-400">
-        Chargement...
+        Loading...
       </div>
     );
 
@@ -59,7 +59,7 @@ export default function EventPage() {
         onClick={() => router.push("/")}
         className="text-sm text-gray-400 hover:text-wine transition-colors mb-8 flex items-center gap-1"
       >
-        &larr; Tous les événements
+        &larr; All events
       </button>
 
       <div className="bg-white rounded-2xl border border-cream-dark p-8 sm:p-10">
@@ -70,7 +70,7 @@ export default function EventPage() {
             <div className="flex items-center gap-2 text-sm bg-cream rounded-lg px-4 py-2">
               <span className="text-gold text-base">&#128197;</span>
               <span className="text-gray-700">
-                {new Date(event.date).toLocaleDateString("fr-FR", {
+                {new Date(event.date).toLocaleDateString("en-US", {
                   weekday: "long",
                   day: "numeric",
                   month: "long",
@@ -99,8 +99,8 @@ export default function EventPage() {
               }`}
             >
               {event.spotsLeft > 0
-                ? `${event.spotsLeft} places restantes sur ${event.maxGuests}`
-                : "Complet — inscription en liste d'attente"}
+                ? `${event.spotsLeft} spots left out of ${event.maxGuests}`
+                : "Full — join the waitlist"}
             </span>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function EventPage() {
         {isPast && event.products.length > 0 && (
           <div className="border-t border-cream-dark pt-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Produits dégustés
+              Products tasted
             </h2>
             <div className="grid gap-3">
               {event.products.map((p) => (
@@ -136,13 +136,13 @@ export default function EventPage() {
         {!isPast && !result && (
           <div className="border-t border-cream-dark pt-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">
-              {event.spotsLeft > 0 ? "S'inscrire" : "Rejoindre la liste d'attente"}
+              {event.spotsLeft > 0 ? "Register" : "Join the waitlist"}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Nom
+                  Name
                 </label>
                 <input
                   type="text"
@@ -150,7 +150,7 @@ export default function EventPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 placeholder-gray-400 transition-all"
-                  placeholder="Votre nom"
+                  placeholder="Your name"
                 />
               </div>
 
@@ -164,13 +164,13 @@ export default function EventPage() {
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 placeholder-gray-400 transition-all"
-                  placeholder="votre@email.com"
+                  placeholder="your@email.com"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Nombre de personnes
+                  Number of guests
                 </label>
                 <input
                   type="number"
@@ -191,10 +191,10 @@ export default function EventPage() {
                 className="w-full sm:w-auto bg-wine text-white px-8 py-3 rounded-xl font-medium hover:bg-wine-light transition-colors disabled:opacity-50"
               >
                 {submitting
-                  ? "Inscription..."
+                  ? "Registering..."
                   : event.spotsLeft > 0
-                    ? "S'inscrire"
-                    : "Rejoindre la liste d'attente"}
+                    ? "Register"
+                    : "Join the waitlist"}
               </button>
             </form>
           </div>
@@ -207,17 +207,17 @@ export default function EventPage() {
               <div className="bg-green-50 border border-green-200 rounded-2xl p-6 text-center">
                 <div className="text-3xl mb-3">&#127870;</div>
                 <h2 className="text-xl font-semibold text-green-800 mb-2">
-                  Inscription confirmée !
+                  Registration confirmed!
                 </h2>
                 <p className="text-green-700">
-                  Un email de confirmation vous a été envoyé.
+                  A confirmation email has been sent to you.
                 </p>
                 {result.token && (
                   <a
                     href={`/registration/${result.token}`}
                     className="inline-block mt-4 text-sm text-wine hover:text-wine-light underline underline-offset-4"
                   >
-                    Modifier mon inscription
+                    Edit my registration
                   </a>
                 )}
               </div>
@@ -225,10 +225,10 @@ export default function EventPage() {
               <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 text-center">
                 <div className="text-3xl mb-3">&#128221;</div>
                 <h2 className="text-xl font-semibold text-amber-800 mb-2">
-                  Liste d&apos;attente
+                  Waitlist
                 </h2>
                 <p className="text-amber-700">
-                  L&apos;événement est complet. Vous serez notifié si une place se libère.
+                  The event is full. You will be notified if a spot opens up.
                 </p>
               </div>
             )}

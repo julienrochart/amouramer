@@ -38,8 +38,8 @@ export default function EditRegistration() {
       <div className="max-w-3xl mx-auto px-6 py-20 text-center">
         <div className="bg-white rounded-2xl border border-cream-dark p-10">
           <div className="text-3xl mb-4">&#128075;</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Inscription annulée</h1>
-          <p className="text-gray-500">Votre inscription a été annulée avec succès.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Registration cancelled</h1>
+          <p className="text-gray-500">Your registration has been successfully cancelled.</p>
         </div>
       </div>
     );
@@ -48,7 +48,7 @@ export default function EditRegistration() {
   if (!data)
     return (
       <div className="max-w-3xl mx-auto px-6 py-20 text-center text-gray-400">
-        Chargement...
+        Loading...
       </div>
     );
 
@@ -74,7 +74,7 @@ export default function EditRegistration() {
   }
 
   async function handleCancel() {
-    if (!confirm("Êtes-vous sûr de vouloir annuler votre inscription ?")) return;
+    if (!confirm("Are you sure you want to cancel your registration?")) return;
     await fetch(`/api/registrations/${token}`, { method: "DELETE" });
     setCancelled(true);
   }
@@ -82,14 +82,14 @@ export default function EditRegistration() {
   return (
     <div className="max-w-3xl mx-auto px-6 py-12">
       <div className="bg-white rounded-2xl border border-cream-dark p-8 sm:p-10">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Mon inscription</h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">My Registration</h1>
 
         <div className="bg-cream rounded-xl p-5 mb-8">
           <h2 className="font-semibold text-gray-900 text-lg">{data.event.title}</h2>
           <div className="flex flex-wrap gap-3 mt-2">
             <span className="text-sm text-gray-600 flex items-center gap-1.5">
               <span className="text-gold">&#128197;</span>
-              {new Date(data.event.date).toLocaleDateString("fr-FR", {
+              {new Date(data.event.date).toLocaleDateString("en-US", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -104,7 +104,7 @@ export default function EditRegistration() {
           </div>
           {data.type === "waitlist" && (
             <span className="inline-block mt-3 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-200 px-3 py-1 rounded-full">
-              Liste d&apos;attente
+              Waitlist
             </span>
           )}
         </div>
@@ -112,7 +112,7 @@ export default function EditRegistration() {
         {data.type === "registration" && (
           <form onSubmit={handleSave} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Nom</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
               <input
                 type="text"
                 required
@@ -135,7 +135,7 @@ export default function EditRegistration() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Nombre de personnes
+                Number of guests
               </label>
               <input
                 type="number"
@@ -157,7 +157,7 @@ export default function EditRegistration() {
             )}
             {saved && (
               <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-sm text-green-700">
-                Modifications enregistrées !
+                Changes saved!
               </div>
             )}
 
@@ -167,7 +167,7 @@ export default function EditRegistration() {
                 disabled={saving}
                 className="bg-wine text-white px-8 py-3 rounded-xl font-medium hover:bg-wine-light transition-colors disabled:opacity-50"
               >
-                {saving ? "..." : "Enregistrer"}
+                {saving ? "..." : "Save"}
               </button>
 
               <button
@@ -175,7 +175,7 @@ export default function EditRegistration() {
                 onClick={handleCancel}
                 className="text-sm text-red-500 hover:text-red-700 transition-colors"
               >
-                Annuler mon inscription
+                Cancel my registration
               </button>
             </div>
           </form>

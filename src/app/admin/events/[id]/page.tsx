@@ -52,7 +52,7 @@ export default function AdminEventDetail() {
   }
 
   async function handleDelete() {
-    if (!confirm("Supprimer cet événement ?")) return;
+    if (!confirm("Delete this event?")) return;
     await adminFetch(`/api/admin/events/${id}`, { method: "DELETE" });
     router.push("/admin/events");
   }
@@ -80,7 +80,7 @@ export default function AdminEventDetail() {
   }
 
   async function sendProductEmails() {
-    if (!confirm("Envoyer la liste des produits à tous les participants ?")) return;
+    if (!confirm("Send the product list to all participants?")) return;
     setSending(true);
     const res = await adminFetch(`/api/admin/events/${id}/send-products`, {
       method: "POST",
@@ -92,7 +92,7 @@ export default function AdminEventDetail() {
 
   if (!event)
     return (
-      <div className="text-center py-20 text-gray-400">Chargement...</div>
+      <div className="text-center py-20 text-gray-400">Loading...</div>
     );
 
   const totalGuests = event.registrations.reduce((sum, r) => sum + r.guests, 0);
@@ -107,12 +107,12 @@ export default function AdminEventDetail() {
             onClick={() => router.push("/admin/events")}
             className="text-sm text-gray-400 hover:text-wine transition-colors mb-3 block"
           >
-            &larr; Événements
+            &larr; Events
           </button>
           <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
           <div className="flex flex-wrap gap-3 mt-2">
             <span className="text-sm text-gray-500">
-              {new Date(event.date).toLocaleDateString("fr-FR", {
+              {new Date(event.date).toLocaleDateString("en-US", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -128,11 +128,11 @@ export default function AdminEventDetail() {
           )}
           <div className="flex gap-4 mt-3">
             <span className="text-sm font-medium text-gray-700">
-              {totalGuests}/{event.maxGuests} inscrits
+              {totalGuests}/{event.maxGuests} registered
             </span>
             {event.waitlist.length > 0 && (
               <span className="text-sm font-medium text-gold">
-                +{event.waitlist.length} en attente
+                +{event.waitlist.length} waitlisted
               </span>
             )}
           </div>
@@ -141,23 +141,23 @@ export default function AdminEventDetail() {
           onClick={handleDelete}
           className="text-sm text-red-400 hover:text-red-600 transition-colors border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50"
         >
-          Supprimer
+          Delete
         </button>
       </div>
 
       {/* Registrations */}
       <section className="bg-white border border-cream-dark rounded-xl p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Inscrits</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Registrations</h2>
         {event.registrations.length === 0 ? (
-          <p className="text-gray-400 text-sm py-4 text-center">Aucune inscription</p>
+          <p className="text-gray-400 text-sm py-4 text-center">No registrations</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-cream-dark text-left text-gray-400 text-xs uppercase tracking-wider">
-                  <th className="py-3 pr-4">Nom</th>
+                  <th className="py-3 pr-4">Name</th>
                   <th className="pr-4">Email</th>
-                  <th className="pr-4">Pers.</th>
+                  <th className="pr-4">Guests</th>
                   <th>Date</th>
                 </tr>
               </thead>
@@ -168,7 +168,7 @@ export default function AdminEventDetail() {
                     <td className="pr-4 text-gray-600">{r.email}</td>
                     <td className="pr-4 text-gray-700">{r.guests}</td>
                     <td className="text-gray-400">
-                      {new Date(r.createdAt).toLocaleDateString("fr-FR")}
+                      {new Date(r.createdAt).toLocaleDateString("en-US")}
                     </td>
                   </tr>
                 ))}
@@ -182,7 +182,7 @@ export default function AdminEventDetail() {
       {event.waitlist.length > 0 && (
         <section className="bg-white border border-cream-dark rounded-xl p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            Liste d&apos;attente
+            Waitlist
             <span className="text-gold text-sm font-normal ml-2">
               ({event.waitlist.length})
             </span>
@@ -191,9 +191,9 @@ export default function AdminEventDetail() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-cream-dark text-left text-gray-400 text-xs uppercase tracking-wider">
-                  <th className="py-3 pr-4">Nom</th>
+                  <th className="py-3 pr-4">Name</th>
                   <th className="pr-4">Email</th>
-                  <th>Pers.</th>
+                  <th>Guests</th>
                 </tr>
               </thead>
               <tbody>
@@ -212,7 +212,7 @@ export default function AdminEventDetail() {
 
       {/* Products */}
       <section className="bg-white border border-cream-dark rounded-xl p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Produits dégustés</h2>
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Products tasted</h2>
 
         {event.products.length > 0 && (
           <div className="space-y-2 mb-6">
@@ -236,7 +236,7 @@ export default function AdminEventDetail() {
                   onClick={() => removeProduct(p.id)}
                   className="text-xs text-red-400 hover:text-red-600 transition-colors"
                 >
-                  Retirer
+                  Remove
                 </button>
               </div>
             ))}
@@ -245,14 +245,14 @@ export default function AdminEventDetail() {
 
         <form onSubmit={addProduct} className="flex flex-col sm:flex-row gap-3 items-end">
           <div className="flex-1">
-            <label className="block text-xs text-gray-400 mb-1">Nom du produit</label>
+            <label className="block text-xs text-gray-400 mb-1">Product name</label>
             <input
               type="text"
               required
               value={productForm.name}
               onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
               className="w-full border border-cream-dark rounded-lg px-3 py-2 text-sm bg-cream/50 transition-all"
-              placeholder="Ex: Domaine Ganevat, Chardonnay 2021"
+              placeholder="e.g. Domaine Ganevat, Chardonnay 2021"
             />
           </div>
           <div className="flex-1">
@@ -264,11 +264,11 @@ export default function AdminEventDetail() {
                 setProductForm({ ...productForm, description: e.target.value })
               }
               className="w-full border border-cream-dark rounded-lg px-3 py-2 text-sm bg-cream/50 transition-all"
-              placeholder="Notes, cépage..."
+              placeholder="Notes, grape variety..."
             />
           </div>
           <div className="w-24">
-            <label className="block text-xs text-gray-400 mb-1">Prix €</label>
+            <label className="block text-xs text-gray-400 mb-1">Price €</label>
             <input
               type="number"
               step="0.01"
@@ -278,7 +278,7 @@ export default function AdminEventDetail() {
             />
           </div>
           <button className="bg-wine text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-wine-light transition-colors shrink-0">
-            Ajouter
+            Add
           </button>
         </form>
 
@@ -290,12 +290,12 @@ export default function AdminEventDetail() {
               className="bg-gold text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gold-light transition-colors disabled:opacity-50"
             >
               {sending
-                ? "Envoi en cours..."
-                : "Envoyer la liste aux participants"}
+                ? "Sending..."
+                : "Send product list to participants"}
             </button>
             {sentCount !== null && (
               <p className="text-green-600 text-sm mt-3">
-                Email envoyé à {sentCount} participant(s) !
+                Email sent to {sentCount} participant(s)!
               </p>
             )}
           </div>

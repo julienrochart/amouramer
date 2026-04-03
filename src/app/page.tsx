@@ -16,17 +16,17 @@ export default async function Home() {
     <div className="max-w-3xl mx-auto px-6 py-12">
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold text-wine tracking-tight mb-3">
-          Nos dégustations
+          Our Tastings
         </h1>
         <p className="text-gray-500 text-lg">
-          Découvrez nos prochains événements de wine pairing
+          Discover our upcoming wine pairing events
         </p>
       </div>
 
       {events.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-2xl border border-cream-dark">
-          <p className="text-gray-400 text-lg">Aucun événement à venir pour le moment.</p>
-          <p className="text-gray-400 text-sm mt-2">Revenez bientôt !</p>
+          <p className="text-gray-400 text-lg">No upcoming events at the moment.</p>
+          <p className="text-gray-400 text-sm mt-2">Check back soon!</p>
         </div>
       ) : (
         <div className="space-y-4">
@@ -51,7 +51,7 @@ export default async function Home() {
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 mt-2">
                       <span className="text-sm text-gray-600 flex items-center gap-1.5">
                         <span className="text-gold">&#9679;</span>
-                        {new Date(event.date).toLocaleDateString("fr-FR", {
+                        {new Date(event.date).toLocaleDateString("en-US", {
                           weekday: "long",
                           day: "numeric",
                           month: "long",
@@ -77,7 +77,7 @@ export default async function Home() {
                         : "bg-wine/10 text-wine border border-wine/20"
                     }`}
                   >
-                    {spotsLeft > 0 ? `${spotsLeft} places` : "Complet"}
+                    {spotsLeft > 0 ? `${spotsLeft} spots` : "Full"}
                   </span>
                 </div>
               </Link>

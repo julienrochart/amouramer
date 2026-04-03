@@ -13,7 +13,7 @@ interface EventInfo {
 }
 
 function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("fr-FR", {
+  return new Date(date).toLocaleDateString("en-US", {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -41,16 +41,16 @@ export async function sendConfirmationEmail({
   await getResend().emails.send({
     from,
     to,
-    subject: `Inscription confirmée - ${event.title}`,
+    subject: `Registration confirmed - ${event.title}`,
     html: `
-      <h2>Bonjour ${name} !</h2>
-      <p>Votre inscription est confirmée pour :</p>
+      <h2>Hi ${name}!</h2>
+      <p>Your registration is confirmed for:</p>
       <p><strong>${event.title}</strong><br/>
       ${formatDate(event.date)}<br/>
       ${event.location}</p>
-      <p>Nombre de personnes : <strong>${guests}</strong></p>
-      <p><a href="${editUrl}">Modifier mon inscription</a></p>
-      <p>À bientôt !<br/>Amour Amer</p>
+      <p>Number of guests: <strong>${guests}</strong></p>
+      <p><a href="${editUrl}">Edit my registration</a></p>
+      <p>See you soon!<br/>Amour Amer</p>
     `,
   });
 }
@@ -67,12 +67,12 @@ export async function sendWaitlistEmail({
   await getResend().emails.send({
     from,
     to,
-    subject: `Liste d'attente - ${event.title}`,
+    subject: `Waitlist - ${event.title}`,
     html: `
-      <h2>Bonjour ${name} !</h2>
-      <p>L'événement <strong>${event.title}</strong> est complet.</p>
-      <p>Vous êtes sur la liste d'attente. Nous vous contacterons si une place se libère.</p>
-      <p>À bientôt !<br/>Amour Amer</p>
+      <h2>Hi ${name}!</h2>
+      <p>The event <strong>${event.title}</strong> is full.</p>
+      <p>You've been added to the waitlist. We'll notify you if a spot opens up.</p>
+      <p>See you soon!<br/>Amour Amer</p>
     `,
   });
 }
@@ -95,16 +95,16 @@ export async function sendUpdateEmail({
   await getResend().emails.send({
     from,
     to,
-    subject: `Inscription modifiée - ${event.title}`,
+    subject: `Registration updated - ${event.title}`,
     html: `
-      <h2>Bonjour ${name} !</h2>
-      <p>Votre inscription a bien été mise à jour :</p>
+      <h2>Hi ${name}!</h2>
+      <p>Your registration has been updated:</p>
       <p><strong>${event.title}</strong><br/>
       ${formatDate(event.date)}<br/>
       ${event.location}</p>
-      <p>Nombre de personnes : <strong>${guests}</strong></p>
-      <p><a href="${editUrl}">Modifier mon inscription</a></p>
-      <p>À bientôt !<br/>Amour Amer</p>
+      <p>Number of guests: <strong>${guests}</strong></p>
+      <p><a href="${editUrl}">Edit my registration</a></p>
+      <p>See you soon!<br/>Amour Amer</p>
     `,
   });
 }
@@ -125,25 +125,25 @@ export async function sendReminderEmail({
   const editUrl = `${appUrl}/registration/${token}`;
   const subject =
     type === "today"
-      ? `C'est aujourd'hui ! ${event.title}`
-      : `Rappel : ${event.title} dans 2 jours`;
+      ? `It's today! ${event.title}`
+      : `Reminder: ${event.title} in 2 days`;
   const intro =
     type === "today"
-      ? "C'est aujourd'hui ! On a hâte de vous retrouver."
-      : "Votre dégustation approche ! On se retrouve dans 2 jours.";
+      ? "It's today! We can't wait to see you."
+      : "Your tasting is coming up! See you in 2 days.";
 
   await getResend().emails.send({
     from,
     to,
     subject,
     html: `
-      <h2>Bonjour ${name} !</h2>
+      <h2>Hi ${name}!</h2>
       <p>${intro}</p>
       <p><strong>${event.title}</strong><br/>
       ${formatDate(event.date)}<br/>
       ${event.location}</p>
-      <p><a href="${editUrl}">Modifier mon inscription</a></p>
-      <p>À très vite !<br/>Amour Amer</p>
+      <p><a href="${editUrl}">Edit my registration</a></p>
+      <p>See you soon!<br/>Amour Amer</p>
     `,
   });
 }
@@ -169,14 +169,14 @@ export async function sendPostEventEmail({
   await getResend().emails.send({
     from,
     to,
-    subject: `Vos dégustations - ${event.title}`,
+    subject: `Your tastings - ${event.title}`,
     html: `
-      <h2>Bonjour ${name} !</h2>
-      <p>Merci d'avoir participé à <strong>${event.title}</strong> !</p>
-      <p>Voici les produits que vous avez dégustés :</p>
+      <h2>Hi ${name}!</h2>
+      <p>Thank you for attending <strong>${event.title}</strong>!</p>
+      <p>Here are the products you tasted:</p>
       <ul>${productList}</ul>
-      <p>Retrouvez-les en boutique chez Amour Amer !</p>
-      <p>À bientôt !<br/>Amour Amer</p>
+      <p>Find them at the Amour Amer shop!</p>
+      <p>See you soon!<br/>Amour Amer</p>
     `,
   });
 }

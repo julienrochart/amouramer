@@ -28,17 +28,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             AA
           </div>
           <h1 className="text-xl font-bold text-gray-900 mb-1">Administration</h1>
-          <p className="text-gray-400 text-sm mb-6">Connectez-vous pour continuer</p>
+          <p className="text-gray-400 text-sm mb-6">Log in to continue</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
               type="password"
-              placeholder="Mot de passe"
+              placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-center text-gray-900 transition-all"
             />
             <button className="w-full bg-wine text-white px-6 py-3 rounded-xl font-medium hover:bg-wine-light transition-colors">
-              Connexion
+              Log in
             </button>
           </form>
         </div>
@@ -70,13 +70,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               : "text-gray-600 hover:text-wine hover:bg-cream"
           }`}
         >
-          Événements
+          Events
         </Link>
         <Link
           href="/"
           className="ml-auto px-4 py-2 rounded-lg text-xs text-gray-400 hover:text-wine transition-colors"
         >
-          Voir le site &rarr;
+          View site &rarr;
         </Link>
       </nav>
       {children}

@@ -30,19 +30,19 @@ export default function AdminHome() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Tableau de bord</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-cream-dark p-5">
-          <p className="text-sm text-gray-400 mb-1">Événements à venir</p>
+          <p className="text-sm text-gray-400 mb-1">Upcoming events</p>
           <p className="text-3xl font-bold text-wine">{upcoming.length}</p>
         </div>
         <div className="bg-white rounded-xl border border-cream-dark p-5">
-          <p className="text-sm text-gray-400 mb-1">Inscrits total</p>
+          <p className="text-sm text-gray-400 mb-1">Total registered</p>
           <p className="text-3xl font-bold text-gray-900">{totalRegistrations}</p>
         </div>
         <div className="bg-white rounded-xl border border-cream-dark p-5">
-          <p className="text-sm text-gray-400 mb-1">En liste d&apos;attente</p>
+          <p className="text-sm text-gray-400 mb-1">On waitlist</p>
           <p className="text-3xl font-bold text-gold">{totalWaitlist}</p>
         </div>
       </div>
@@ -52,10 +52,10 @@ export default function AdminHome() {
         className="block bg-white rounded-xl border border-cream-dark p-6 hover:border-gold/50 hover:shadow-md transition-all group"
       >
         <h2 className="text-lg font-semibold text-gray-900 group-hover:text-wine transition-colors">
-          Gérer les événements
+          Manage events
         </h2>
         <p className="text-gray-400 text-sm mt-1">
-          Créer, modifier, voir les inscriptions et ajouter des produits
+          Create, edit, view registrations and add products
         </p>
       </Link>
     </div>
