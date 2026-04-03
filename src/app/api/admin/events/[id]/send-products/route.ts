@@ -28,6 +28,13 @@ export async function POST(
     return NextResponse.json({ error: "No products to send" }, { status: 400 });
   }
 
+  if (event.productsSentAt) {
+    return NextResponse.json(
+      { error: "Product emails have already been sent", sentAt: event.productsSentAt },
+      { status: 409 }
+    );
+  }
+
   let sent = 0;
   for (const reg of event.registrations) {
     await sendPostEventEmail({
@@ -38,6 +45,11 @@ export async function POST(
     });
     sent++;
   }
+
+  await prisma.event.update({
+    where: { id },
+    data: { productsSentAt: new Date() },
+  });
 
   return NextResponse.json({ sent });
 }

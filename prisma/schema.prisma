@@ -13,9 +13,10 @@ model Event {
   description String?
   date        DateTime
   location    String
-  maxGuests   Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  maxGuests       Int
+  productsSentAt  DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   registrations Registration[]
   waitlist      WaitlistEntry[]

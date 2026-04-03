@@ -10,6 +10,7 @@ interface EventDetail {
   description: string | null;
   date: string;
   location: string;
+  productsSentAt: string | null;
   maxGuests: number;
   registrations: {
     id: string;
@@ -282,17 +283,38 @@ export default function AdminEventDetail() {
           </button>
         </form>
 
-        {isPast && event.products.length > 0 && (
+        {event.products.length > 0 && (
           <div className="mt-6 pt-6 border-t border-cream-dark">
-            <button
-              onClick={sendProductEmails}
-              disabled={sending}
-              className="bg-gold text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gold-light transition-colors disabled:opacity-50"
-            >
-              {sending
-                ? "Sending..."
-                : "Send product list to participants"}
-            </button>
+            {event.productsSentAt ? (
+              <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded-xl px-4 py-3">
+                <span>&#9989;</span>
+                <span>
+                  Product list sent on{" "}
+                  {new Date(event.productsSentAt).toLocaleDateString("en-US", {
+                    weekday: "short",
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </span>
+              </div>
+            ) : (
+              <>
+                <button
+                  onClick={sendProductEmails}
+                  disabled={sending}
+                  className="bg-gold text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gold-light transition-colors disabled:opacity-50"
+                >
+                  {sending
+                    ? "Sending..."
+                    : "Send product list to participants"}
+                </button>
+                <p className="text-xs text-gray-400 mt-2">
+                  Not sent yet
+                </p>
+              </>
+            )}
             {sentCount !== null && (
               <p className="text-green-600 text-sm mt-3">
                 Email sent to {sentCount} participant(s)!
