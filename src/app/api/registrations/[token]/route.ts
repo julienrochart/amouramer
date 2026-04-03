@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { sendUpdateEmail } from "@/lib/email";
 
 export async function GET(
   _request: NextRequest,
@@ -63,6 +64,14 @@ export async function PATCH(
   const updated = await prisma.registration.update({
     where: { token },
     data: { ...(name && { name }), ...(email && { email }), ...(guests && { guests }) },
+  });
+
+  await sendUpdateEmail({
+    to: updated.email,
+    name: updated.name,
+    event: registration.event,
+    guests: updated.guests,
+    token,
   });
 
   return NextResponse.json(updated);

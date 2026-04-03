@@ -77,6 +77,38 @@ export async function sendWaitlistEmail({
   });
 }
 
+export async function sendUpdateEmail({
+  to,
+  name,
+  event,
+  guests,
+  token,
+}: {
+  to: string;
+  name: string;
+  event: EventInfo;
+  guests: number;
+  token: string;
+}) {
+  const editUrl = `${appUrl}/registration/${token}`;
+
+  await getResend().emails.send({
+    from,
+    to,
+    subject: `Inscription modifiée - ${event.title}`,
+    html: `
+      <h2>Bonjour ${name} !</h2>
+      <p>Votre inscription a bien été mise à jour :</p>
+      <p><strong>${event.title}</strong><br/>
+      ${formatDate(event.date)}<br/>
+      ${event.location}</p>
+      <p>Nombre de personnes : <strong>${guests}</strong></p>
+      <p><a href="${editUrl}">Modifier mon inscription</a></p>
+      <p>À bientôt !<br/>Amour Amer</p>
+    `,
+  });
+}
+
 export async function sendReminderEmail({
   to,
   name,
