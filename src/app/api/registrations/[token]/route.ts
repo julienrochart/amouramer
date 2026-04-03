@@ -35,7 +35,7 @@ export async function PATCH(
 ) {
   const { token } = await params;
   const body = await request.json();
-  const { name, email, guests } = body;
+  const { name, email, guests, optInReminders, optInProducts } = body;
 
   const registration = await prisma.registration.findUnique({
     where: { token },
@@ -63,7 +63,13 @@ export async function PATCH(
 
   const updated = await prisma.registration.update({
     where: { token },
-    data: { ...(name && { name }), ...(email && { email }), ...(guests && { guests }) },
+    data: {
+      ...(name && { name }),
+      ...(email && { email }),
+      ...(guests && { guests }),
+      ...(optInReminders !== undefined && { optInReminders }),
+      ...(optInProducts !== undefined && { optInProducts }),
+    },
   });
 
   await sendUpdateEmail({

@@ -27,7 +27,9 @@ model Registration {
   token     String   @unique @default(cuid())
   name      String
   email     String
-  guests    Int      @default(1)
+  guests          Int      @default(1)
+  optInReminders  Boolean  @default(true)
+  optInProducts   Boolean  @default(true)
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
@@ -41,7 +43,9 @@ model WaitlistEntry {
   token     String   @unique @default(cuid())
   name      String
   email     String
-  guests    Int      @default(1)
+  guests          Int      @default(1)
+  optInReminders  Boolean  @default(true)
+  optInProducts   Boolean  @default(true)
   eventId   String
   event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())

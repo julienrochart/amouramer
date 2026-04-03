@@ -4,7 +4,7 @@ import { sendConfirmationEmail, sendWaitlistEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, email, guests, eventId } = body;
+  const { name, email, guests, eventId, optInReminders = true, optInProducts = true } = body;
 
   if (!name || !email || !guests || !eventId) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
   if (spotsLeft >= guests) {
     const registration = await prisma.registration.create({
-      data: { name, email, guests, eventId },
+      data: { name, email, guests, eventId, optInReminders, optInProducts },
     });
 
     await sendConfirmationEmail({ to: email, name, event, guests, token: registration.token });
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
 
   // Add to waitlist
   const entry = await prisma.waitlistEntry.create({
-    data: { name, email, guests, eventId },
+    data: { name, email, guests, eventId, optInReminders, optInProducts },
   });
 
   await sendWaitlistEmail({ to: email, name, event });

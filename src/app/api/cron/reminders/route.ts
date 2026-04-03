@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
   const todayEvents = await prisma.event.findMany({
     where: { date: { gte: now, lte: endOfDay } },
-    include: { registrations: true },
+    include: { registrations: { where: { optInReminders: true } } },
   });
 
   for (const event of todayEvents) {
@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
 
   const upcomingEvents = await prisma.event.findMany({
     where: { date: { gte: twoDaysFrom, lte: twoDaysTo } },
-    include: { registrations: true },
+    include: { registrations: { where: { optInReminders: true } } },
   });
 
   for (const event of upcomingEvents) {

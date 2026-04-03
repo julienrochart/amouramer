@@ -15,7 +15,7 @@ export async function POST(
   const event = await prisma.event.findUnique({
     where: { id },
     include: {
-      registrations: true,
+      registrations: { where: { optInProducts: true } },
       products: true,
     },
   });

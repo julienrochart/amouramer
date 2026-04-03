@@ -8,6 +8,8 @@ interface Registration {
   name: string;
   email: string;
   guests: number;
+  optInReminders: boolean;
+  optInProducts: boolean;
   event: {
     title: string;
     date: string;
@@ -18,7 +20,7 @@ interface Registration {
 export default function EditRegistration() {
   const { token } = useParams<{ token: string }>();
   const [data, setData] = useState<Registration | null>(null);
-  const [form, setForm] = useState({ name: "", email: "", guests: 1 });
+  const [form, setForm] = useState({ name: "", email: "", guests: 1, optInReminders: true, optInProducts: true });
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [cancelled, setCancelled] = useState(false);
@@ -29,7 +31,7 @@ export default function EditRegistration() {
       .then((r) => r.json())
       .then((d) => {
         setData(d);
-        setForm({ name: d.name, email: d.email, guests: d.guests });
+        setForm({ name: d.name, email: d.email, guests: d.guests, optInReminders: d.optInReminders, optInProducts: d.optInProducts });
       });
   }, [token]);
 
@@ -148,6 +150,38 @@ export default function EditRegistration() {
                 }
                 className="w-32 border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
               />
+            </div>
+
+            <div className="space-y-3 bg-cream/50 border border-cream-dark rounded-xl p-4">
+              <p className="text-sm font-medium text-gray-700">Email preferences</p>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.optInReminders}
+                  onChange={(e) => setForm({ ...form, optInReminders: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 accent-wine rounded"
+                />
+                <span className="text-sm text-gray-600">
+                  Send me reminders before the event
+                  <span className="block text-xs text-gray-400 mt-0.5">
+                    You will receive a reminder 2 days before and on the day of the event
+                  </span>
+                </span>
+              </label>
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.optInProducts}
+                  onChange={(e) => setForm({ ...form, optInProducts: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 accent-wine rounded"
+                />
+                <span className="text-sm text-gray-600">
+                  Send me the list of products tasted after the event
+                  <span className="block text-xs text-gray-400 mt-0.5">
+                    You will receive an email with all the products you tasted so you can find them at the shop
+                  </span>
+                </span>
+              </label>
             </div>
 
             {error && (
