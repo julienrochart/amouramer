@@ -15,6 +15,7 @@ model Event {
   location    String
   maxGuests       Int
   productsSentAt  DateTime?
+  anonymizedAt    DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 

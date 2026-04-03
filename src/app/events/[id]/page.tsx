@@ -217,6 +217,10 @@ export default function EventPage() {
                 </label>
               </div>
 
+              <p className="text-xs text-gray-400">
+                Your personal data will be anonymized 3 days after the event.
+              </p>
+
               <button
                 type="submit"
                 disabled={submitting}
