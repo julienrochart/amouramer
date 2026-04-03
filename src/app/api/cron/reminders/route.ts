@@ -9,54 +9,51 @@ export async function GET(request: NextRequest) {
   }
 
   const now = new Date();
-
-  // Find events happening in ~24 hours (window: 23h30 to 24h30)
-  const dayBefore = {
-    from: new Date(now.getTime() + 23.5 * 60 * 60 * 1000),
-    to: new Date(now.getTime() + 24.5 * 60 * 60 * 1000),
-  };
-
-  // Find events happening in ~3 hours (window: 2h30 to 3h30)
-  const hoursBefore = {
-    from: new Date(now.getTime() + 2.5 * 60 * 60 * 1000),
-    to: new Date(now.getTime() + 3.5 * 60 * 60 * 1000),
-  };
-
   let sent = 0;
 
-  // Day-before reminders
-  const dayEvents = await prisma.event.findMany({
-    where: { date: { gte: dayBefore.from, lte: dayBefore.to } },
+  // Events happening TODAY
+  const endOfDay = new Date(now);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  const todayEvents = await prisma.event.findMany({
+    where: { date: { gte: now, lte: endOfDay } },
     include: { registrations: true },
   });
 
-  for (const event of dayEvents) {
+  for (const event of todayEvents) {
     for (const reg of event.registrations) {
       await sendReminderEmail({
         to: reg.email,
         name: reg.name,
         event,
         token: reg.token,
-        type: "day-before",
+        type: "today",
       });
       sent++;
     }
   }
 
-  // Hours-before reminders
-  const hourEvents = await prisma.event.findMany({
-    where: { date: { gte: hoursBefore.from, lte: hoursBefore.to } },
+  // Events happening in 2 DAYS
+  const twoDaysFrom = new Date(now);
+  twoDaysFrom.setDate(twoDaysFrom.getDate() + 2);
+  twoDaysFrom.setHours(0, 0, 0, 0);
+
+  const twoDaysTo = new Date(twoDaysFrom);
+  twoDaysTo.setHours(23, 59, 59, 999);
+
+  const upcomingEvents = await prisma.event.findMany({
+    where: { date: { gte: twoDaysFrom, lte: twoDaysTo } },
     include: { registrations: true },
   });
 
-  for (const event of hourEvents) {
+  for (const event of upcomingEvents) {
     for (const reg of event.registrations) {
       await sendReminderEmail({
         to: reg.email,
         name: reg.name,
         event,
         token: reg.token,
-        type: "hours-before",
+        type: "two-days-before",
       });
       sent++;
     }

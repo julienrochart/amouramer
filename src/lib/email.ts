@@ -120,18 +120,17 @@ export async function sendReminderEmail({
   name: string;
   event: EventInfo;
   token: string;
-  type: "day-before" | "hours-before";
+  type: "today" | "two-days-before";
 }) {
   const editUrl = `${appUrl}/registration/${token}`;
   const subject =
-    type === "day-before"
-      ? `Rappel : ${event.title} demain !`
-      : `C'est ce soir ! ${event.title}`;
-
+    type === "today"
+      ? `C'est aujourd'hui ! ${event.title}`
+      : `Rappel : ${event.title} dans 2 jours`;
   const intro =
-    type === "day-before"
-      ? "C'est demain ! On a hâte de vous voir."
-      : "C'est ce soir ! On vous attend.";
+    type === "today"
+      ? "C'est aujourd'hui ! On a hâte de vous retrouver."
+      : "Votre dégustation approche ! On se retrouve dans 2 jours.";
 
   await getResend().emails.send({
     from,
