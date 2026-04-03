@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  date        DateTime
+  location    String
+  maxGuests   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  registrations Registration[]
+  waitlist      WaitlistEntry[]
+  products      EventProduct[]
+}
+
+model Registration {
+  id        String   @id @default(cuid())
+  token     String   @unique @default(cuid())
+  name      String
+  email     String
+  guests    Int      @default(1)
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([eventId])
+}
+
+model WaitlistEntry {
+  id        String   @id @default(cuid())
+  token     String   @unique @default(cuid())
+  name      String
+  email     String
+  guests    Int      @default(1)
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+}
+
+model EventProduct {
+  id          String @id @default(cuid())
+  name        String
+  description String?
+  price       Float?
+  eventId     String
+  event       Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId])
+}

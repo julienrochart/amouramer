@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(shopt -s dotglob)",
+      "Bash(mv * ..)",
+      "Bash(rm -rf amour-amer)",
+      "Bash(mv amour-amer/.* amour-amer/* .)",
+      "Bash(rmdir amour-amer:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npx next:*)",
+      "Bash(npm search:*)",
+      "Bash(npm info:*)",
+      "Bash(supabase --version)",
+      "Bash(python3:*)"
+    ]
+  }
+}
