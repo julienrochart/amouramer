@@ -109,6 +109,38 @@ export async function sendUpdateEmail({
   });
 }
 
+export async function sendPromotionEmail({
+  to,
+  name,
+  event,
+  guests,
+  token,
+}: {
+  to: string;
+  name: string;
+  event: EventInfo;
+  guests: number;
+  token: string;
+}) {
+  const editUrl = `${appUrl}/registration/${token}`;
+
+  await getResend().emails.send({
+    from,
+    to,
+    subject: `A spot opened up! - ${event.title}`,
+    html: `
+      <h2>Hi ${name}!</h2>
+      <p>Great news! A spot opened up and you've been registered for:</p>
+      <p><strong>${event.title}</strong><br/>
+      ${formatDate(event.date)}<br/>
+      ${event.location}</p>
+      <p>Number of guests: <strong>${guests}</strong></p>
+      <p><a href="${editUrl}">Edit my registration</a></p>
+      <p>See you soon!<br/>Amour Amer</p>
+    `,
+  });
+}
+
 export async function sendReminderEmail({
   to,
   name,

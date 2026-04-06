@@ -15,7 +15,8 @@
       "Bash(supabase --version)",
       "Bash(python3:*)",
       "Bash(DATABASE_URL=\"postgresql://postgres:CLB5Ee4SH3GaqjjF@db.azxhqwehevotczmjgeir.supabase.co:5432/postgres\" npx prisma:*)",
-      "Bash(DIRECT_URL=\"postgresql://postgres:CLB5Ee4SH3GaqjjF@db.azxhqwehevotczmjgeir.supabase.co:5432/postgres\" node:*)"
+      "Bash(DIRECT_URL=\"postgresql://postgres:CLB5Ee4SH3GaqjjF@db.azxhqwehevotczmjgeir.supabase.co:5432/postgres\" node:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

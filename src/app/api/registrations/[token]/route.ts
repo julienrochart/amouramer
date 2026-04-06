@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { sendUpdateEmail } from "@/lib/email";
+import { sendUpdateEmail, sendPromotionEmail } from "@/lib/email";
 
 export async function GET(
   _request: NextRequest,
@@ -80,6 +80,45 @@ export async function PATCH(
     token,
   });
 
+  // Promote waitlist entries if guests were reduced and spots freed up
+  if (guests && guests < registration.guests) {
+    const totalGuests = registration.event.registrations
+      .reduce((sum, r) => sum + r.guests, 0)
+      - registration.guests + guests; // adjust for the update
+    let spotsLeft = registration.event.maxGuests - totalGuests;
+
+    while (spotsLeft > 0) {
+      const nextInLine = await prisma.waitlistEntry.findFirst({
+        where: { eventId: registration.eventId },
+        orderBy: { createdAt: "asc" },
+      });
+
+      if (!nextInLine || nextInLine.guests > spotsLeft) break;
+
+      const promoted = await prisma.registration.create({
+        data: {
+          name: nextInLine.name,
+          email: nextInLine.email,
+          guests: nextInLine.guests,
+          eventId: nextInLine.eventId,
+          optInReminders: nextInLine.optInReminders,
+          optInProducts: nextInLine.optInProducts,
+        },
+      });
+      await prisma.waitlistEntry.delete({ where: { id: nextInLine.id } });
+
+      await sendPromotionEmail({
+        to: nextInLine.email,
+        name: nextInLine.name,
+        event: registration.event,
+        guests: nextInLine.guests,
+        token: promoted.token,
+      });
+
+      spotsLeft -= nextInLine.guests;
+    }
+  }
+
   return NextResponse.json(updated);
 }
 
@@ -91,6 +130,7 @@ export async function DELETE(
 
   const registration = await prisma.registration.findUnique({
     where: { token },
+    include: { event: { include: { registrations: { select: { id: true, guests: true } } } } },
   });
 
   if (!registration) {
@@ -99,23 +139,38 @@ export async function DELETE(
 
   await prisma.registration.delete({ where: { token } });
 
-  // Promote first waitlist entry if available
-  const nextInLine = await prisma.waitlistEntry.findFirst({
-    where: { eventId: registration.eventId },
-    orderBy: { createdAt: "asc" },
-  });
+  // Promote waitlist entries into freed spots
+  let spotsLeft = registration.guests;
 
-  if (nextInLine) {
-    await prisma.registration.create({
+  while (spotsLeft > 0) {
+    const nextInLine = await prisma.waitlistEntry.findFirst({
+      where: { eventId: registration.eventId },
+      orderBy: { createdAt: "asc" },
+    });
+
+    if (!nextInLine || nextInLine.guests > spotsLeft) break;
+
+    const promoted = await prisma.registration.create({
       data: {
         name: nextInLine.name,
         email: nextInLine.email,
         guests: nextInLine.guests,
         eventId: nextInLine.eventId,
+        optInReminders: nextInLine.optInReminders,
+        optInProducts: nextInLine.optInProducts,
       },
     });
     await prisma.waitlistEntry.delete({ where: { id: nextInLine.id } });
-    // TODO: send promotion email to nextInLine
+
+    await sendPromotionEmail({
+      to: nextInLine.email,
+      name: nextInLine.name,
+      event: registration.event,
+      guests: nextInLine.guests,
+      token: promoted.token,
+    });
+
+    spotsLeft -= nextInLine.guests;
   }
 
   return NextResponse.json({ status: "cancelled" });
