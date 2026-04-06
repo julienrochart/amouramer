@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     data: { name, email, guests, eventId, optInReminders, optInProducts },
   });
 
-  await sendWaitlistEmail({ to: email, name, event });
+  await sendWaitlistEmail({ to: email, name, event, token: entry.token });
 
   return NextResponse.json({ status: "waitlisted", token: entry.token });
 }

@@ -40,8 +40,8 @@ export default function EditRegistration() {
       <div className="max-w-3xl mx-auto px-6 py-20 text-center">
         <div className="bg-white rounded-2xl border border-cream-dark p-10">
           <div className="text-3xl mb-4">&#128075;</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Registration cancelled</h1>
-          <p className="text-gray-500">Your registration has been successfully cancelled.</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Cancelled</h1>
+          <p className="text-gray-500">You have been successfully removed.</p>
         </div>
       </div>
     );
@@ -76,7 +76,10 @@ export default function EditRegistration() {
   }
 
   async function handleCancel() {
-    if (!confirm("Are you sure you want to cancel your registration?")) return;
+    const message = data?.type === "waitlist"
+      ? "Are you sure you want to leave the waitlist?"
+      : "Are you sure you want to cancel your registration?";
+    if (!confirm(message)) return;
     await fetch(`/api/registrations/${token}`, { method: "DELETE" });
     setCancelled(true);
   }
@@ -105,9 +108,21 @@ export default function EditRegistration() {
             </span>
           </div>
           {data.type === "waitlist" && (
-            <span className="inline-block mt-3 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-200 px-3 py-1 rounded-full">
-              Waitlist
-            </span>
+            <div className="mt-4 space-y-4">
+              <span className="inline-block text-xs font-medium text-amber-700 bg-amber-100 border border-amber-200 px-3 py-1 rounded-full">
+                Waitlist
+              </span>
+              <p className="text-sm text-gray-600">
+                You are on the waitlist. If a spot opens up, you will be <strong>automatically registered</strong> and receive a confirmation email.
+              </p>
+              <button
+                type="button"
+                onClick={handleCancel}
+                className="text-sm text-red-500 hover:text-red-700 transition-colors"
+              >
+                Leave the waitlist
+              </button>
+            </div>
           )}
         </div>
 

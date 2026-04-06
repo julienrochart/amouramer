@@ -59,19 +59,27 @@ export async function sendWaitlistEmail({
   to,
   name,
   event,
+  token,
 }: {
   to: string;
   name: string;
   event: EventInfo;
+  token: string;
 }) {
+  const cancelUrl = `${appUrl}/registration/${token}`;
+
   await getResend().emails.send({
     from,
     to,
     subject: `Waitlist - ${event.title}`,
     html: `
       <h2>Hi ${name}!</h2>
-      <p>The event <strong>${event.title}</strong> is full.</p>
-      <p>You've been added to the waitlist. We'll notify you if a spot opens up.</p>
+      <p>The event <strong>${event.title}</strong> is currently full.</p>
+      <p>You've been added to the waitlist.</p>
+      <h3>How does it work?</h3>
+      <p>If a spot opens up, you will be <strong>automatically registered</strong> and we'll send you a confirmation email right away. No action needed on your side — we've got you covered!</p>
+      <p>If you change your mind, you can cancel your spot on the waitlist anytime:</p>
+      <p><a href="${cancelUrl}">Cancel my waitlist entry</a></p>
       <p>See you soon!<br/>Amour Amer</p>
     `,
   });

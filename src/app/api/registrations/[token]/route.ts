@@ -128,6 +128,16 @@ export async function DELETE(
 ) {
   const { token } = await params;
 
+  // Try waitlist entry first (no promotion needed)
+  const waitlistEntry = await prisma.waitlistEntry.findUnique({
+    where: { token },
+  });
+
+  if (waitlistEntry) {
+    await prisma.waitlistEntry.delete({ where: { token } });
+    return NextResponse.json({ status: "cancelled" });
+  }
+
   const registration = await prisma.registration.findUnique({
     where: { token },
     include: { event: { include: { registrations: { select: { id: true, guests: true } } } } },
