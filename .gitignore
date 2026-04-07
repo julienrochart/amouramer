@@ -44,4 +44,5 @@ next-env.d.ts
 
 # tooling (not part of the app)
 /_bmad/
+/_bmad-output/
 /.claude/
