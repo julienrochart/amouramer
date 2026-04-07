@@ -3,7 +3,7 @@ import { Resend } from "resend";
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY || "");
 }
-const from = "Amour Amer <onboarding@resend.dev>";
+const from = "Amour Amer <no-reply@amouramer.nl>";
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 interface EventInfo {
