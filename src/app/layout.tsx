@@ -52,6 +52,17 @@ export default function RootLayout({
         <footer className="border-t border-cream-dark py-8 mt-16">
           <div className="max-w-3xl mx-auto px-6 text-center text-sm text-gray-400">
             Amour Amer &middot; Wine & Food
+            <div className="mt-2 text-xs text-gray-300">
+              Crafted by{" "}
+              <a
+                href="https://www.linkedin.com/in/julien-rochart"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-500 transition-colors"
+              >
+                Julien
+              </a>
+            </div>
           </div>
         </footer>
       </body>

@@ -6,6 +6,10 @@ function getResend() {
 const from = "Amour Amer <no-reply@amouramer.nl>";
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+const VENUE_ADDRESS = "Amour Amer, 196-H Marnixstraat 1016TJ Amsterdam";
+const VENUE_MAPS_URL =
+  "https://www.google.com/maps/search/?api=1&query=Amour+Amer+196-H+Marnixstraat+1016TJ+Amsterdam";
+
 interface EventInfo {
   title: string;
   date: Date;
@@ -21,6 +25,23 @@ function formatDate(date: Date): string {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function daysUntil(date: Date): number {
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  const target = new Date(date);
+  target.setHours(0, 0, 0, 0);
+  return Math.round((target.getTime() - start.getTime()) / 86_400_000);
+}
+
+function seeYouLine(date: Date): string {
+  const days = daysUntil(date);
+  let when: string;
+  if (days <= 0) when = "today";
+  else if (days === 1) when = "tomorrow";
+  else when = `in ${days} days`;
+  return `<p>See you ${when} at <a href="${VENUE_MAPS_URL}">${VENUE_ADDRESS}</a>!</p>`;
 }
 
 export async function sendConfirmationEmail({
@@ -50,7 +71,8 @@ export async function sendConfirmationEmail({
       ${event.location}</p>
       <p>Number of guests: <strong>${guests}</strong></p>
       <p><a href="${editUrl}">Edit my registration</a></p>
-      <p>See you soon!<br/>Amour Amer</p>
+      ${seeYouLine(event.date)}
+      <p>Amour Amer</p>
     `,
   });
 }
