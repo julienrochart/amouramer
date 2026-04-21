@@ -56,6 +56,8 @@ export default function AdminEventDetail() {
   const [notifyOnDelete, setNotifyOnDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showSendProductsModal, setShowSendProductsModal] = useState(false);
+  const [sendProductsError, setSendProductsError] = useState<string | null>(null);
 
   useEffect(() => {
     loadEvent();
@@ -153,15 +155,28 @@ export default function AdminEventDetail() {
     loadEvent();
   }
 
+  function openSendProductsModal() {
+    setSendProductsError(null);
+    setShowSendProductsModal(true);
+  }
+
   async function sendProductEmails() {
-    if (!confirm("Send the product list to all participants?")) return;
     setSending(true);
+    setSendProductsError(null);
     const res = await adminFetch(`/api/admin/events/${id}/send-products`, {
       method: "POST",
     });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      setSendProductsError(err.error || res.statusText || "Unknown error");
+      setSending(false);
+      return;
+    }
     const data = await res.json();
     setSentCount(data.sent);
     setSending(false);
+    setShowSendProductsModal(false);
+    loadEvent();
   }
 
   if (!event)
@@ -469,7 +484,7 @@ export default function AdminEventDetail() {
             ) : (
               <>
                 <button
-                  onClick={sendProductEmails}
+                  onClick={openSendProductsModal}
                   disabled={sending}
                   className="bg-gold text-white px-6 py-2.5 rounded-xl text-sm font-medium hover:bg-gold-light transition-colors disabled:opacity-50"
                 >
@@ -490,6 +505,54 @@ export default function AdminEventDetail() {
           </div>
         )}
       </section>
+
+      {showSendProductsModal && event && (() => {
+        const recipientCount = event.registrations.length;
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !sending && setShowSendProductsModal(false)}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                Send product list?
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                The product list ({event.products.length} item(s)) will be emailed to{" "}
+                <strong>{recipientCount}</strong> participant(s) of &ldquo;{event.title}&rdquo;.
+              </p>
+
+              {sendProductsError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
+                  {sendProductsError}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowSendProductsModal(false)}
+                  disabled={sending}
+                  className="bg-cream text-gray-600 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-cream-dark transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={sendProductEmails}
+                  disabled={sending}
+                  className="bg-gold text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-gold-light transition-colors disabled:opacity-50"
+                >
+                  {sending ? "Sending..." : "Send"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {showDeleteModal && event && (() => {
         const totalRegistered = event.registrations.reduce((sum, r) => sum + r.guests, 0);
