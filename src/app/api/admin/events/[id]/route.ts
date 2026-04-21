@@ -94,6 +94,16 @@ export async function DELETE(
     notified = results.filter((r) => r.status === "fulfilled").length;
   }
 
-  await prisma.event.delete({ where: { id } });
+  try {
+    await prisma.event.delete({ where: { id } });
+  } catch (err) {
+    console.error("Event delete failed:", err);
+    const message = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json(
+      { error: `Delete failed: ${message}` },
+      { status: 500 }
+    );
+  }
+
   return NextResponse.json({ status: "deleted", notified });
 }
