@@ -51,6 +51,11 @@ export default function AdminEventDetail() {
     maxGuests: 20,
   });
   const [savingEdit, setSavingEdit] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [notifyOnDelete, setNotifyOnDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
     loadEvent();
@@ -61,40 +66,29 @@ export default function AdminEventDetail() {
     if (res.ok) setEvent(await res.json());
   }
 
-  async function handleDelete() {
+  function openDeleteModal() {
+    setDeleteError(null);
+    setNotifyOnDelete(false);
+    setShowDeleteModal(true);
+  }
+
+  async function confirmDelete() {
     if (!event) return;
-
-    const totalRegistered = event.registrations.reduce((sum, r) => sum + r.guests, 0);
-    const waitlistCount = event.waitlist.length;
-    const hasPeople = event.registrations.length > 0 || waitlistCount > 0;
-
-    const confirmMsg = hasPeople
-      ? `Delete "${event.title}"?\n\n${event.registrations.length} registration(s) (${totalRegistered} guest(s)) and ${waitlistCount} waitlist entry/entries will be removed.\n\nThis cannot be undone.`
-      : `Delete "${event.title}"? This cannot be undone.`;
-    if (!confirm(confirmMsg)) return;
-
-    let notify = false;
-    if (hasPeople) {
-      notify = confirm(
-        `Send an apology email to all ${event.registrations.length + waitlistCount} participant(s)?`
-      );
-    }
+    setDeleting(true);
+    setDeleteError(null);
 
     const res = await adminFetch(`/api/admin/events/${id}`, {
       method: "DELETE",
-      body: JSON.stringify({ notify }),
+      body: JSON.stringify({ notify: notifyOnDelete }),
     });
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      alert(`Failed to delete: ${err.error || res.statusText}`);
+      setDeleteError(err.error || res.statusText || "Unknown error");
+      setDeleting(false);
       return;
     }
 
-    const data = await res.json().catch(() => ({ notified: 0 }));
-    if (notify && data.notified !== undefined) {
-      alert(`Event deleted. Apology email sent to ${data.notified} participant(s).`);
-    }
     router.push("/admin/events");
   }
 
@@ -116,6 +110,7 @@ export default function AdminEventDetail() {
   async function handleEdit(e: React.FormEvent) {
     e.preventDefault();
     setSavingEdit(true);
+    setEditError(null);
     const res = await adminFetch(`/api/admin/events/${id}`, {
       method: "PATCH",
       body: JSON.stringify({
@@ -129,7 +124,7 @@ export default function AdminEventDetail() {
     setSavingEdit(false);
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      alert(`Failed to update: ${err.error || res.statusText}`);
+      setEditError(err.error || res.statusText || "Unknown error");
       return;
     }
     setEditing(false);
@@ -224,7 +219,7 @@ export default function AdminEventDetail() {
             Edit
           </button>
           <button
-            onClick={handleDelete}
+            onClick={openDeleteModal}
             className="text-sm text-red-400 hover:text-red-600 transition-colors border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50"
           >
             Delete
@@ -291,6 +286,11 @@ export default function AdminEventDetail() {
               className="w-32 border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
             />
           </div>
+          {editError && (
+            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3">
+              {editError}
+            </div>
+          )}
           <div className="flex gap-3">
             <button
               type="submit"
@@ -301,7 +301,10 @@ export default function AdminEventDetail() {
             </button>
             <button
               type="button"
-              onClick={() => setEditing(false)}
+              onClick={() => {
+                setEditing(false);
+                setEditError(null);
+              }}
               className="bg-cream text-gray-600 px-6 py-3 rounded-xl font-medium hover:bg-cream-dark transition-colors"
             >
               Cancel
@@ -487,6 +490,78 @@ export default function AdminEventDetail() {
           </div>
         )}
       </section>
+
+      {showDeleteModal && event && (() => {
+        const totalRegistered = event.registrations.reduce((sum, r) => sum + r.guests, 0);
+        const waitlistCount = event.waitlist.length;
+        const participantCount = event.registrations.length + waitlistCount;
+        const hasPeople = participantCount > 0;
+
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !deleting && setShowDeleteModal(false)}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                Delete &ldquo;{event.title}&rdquo;?
+              </h2>
+              {hasPeople ? (
+                <p className="text-sm text-gray-600 mb-4">
+                  <strong>{event.registrations.length}</strong> registration(s) (
+                  <strong>{totalRegistered}</strong> guest(s)) and{" "}
+                  <strong>{waitlistCount}</strong> waitlist entry/entries will be removed. This
+                  cannot be undone.
+                </p>
+              ) : (
+                <p className="text-sm text-gray-600 mb-4">This cannot be undone.</p>
+              )}
+
+              {hasPeople && (
+                <label className="flex items-start gap-2 text-sm text-gray-700 bg-cream/50 border border-cream-dark rounded-xl px-4 py-3 mb-4 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={notifyOnDelete}
+                    onChange={(e) => setNotifyOnDelete(e.target.checked)}
+                    className="mt-0.5"
+                  />
+                  <span>
+                    Send an apology email to all {participantCount} participant(s)
+                  </span>
+                </label>
+              )}
+
+              {deleteError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(false)}
+                  disabled={deleting}
+                  className="bg-cream text-gray-600 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-cream-dark transition-colors disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmDelete}
+                  disabled={deleting}
+                  className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
