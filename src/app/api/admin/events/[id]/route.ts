@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAuthorized } from "@/lib/auth";
+import { sendCancellationEmail } from "@/lib/email";
 
 export async function GET(
   request: NextRequest,
@@ -62,6 +63,37 @@ export async function DELETE(
   }
 
   const { id } = await params;
+
+  let notify = false;
+  try {
+    const body = await request.json();
+    notify = body?.notify === true;
+  } catch {
+    // no body, notify stays false
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: { registrations: true, waitlist: true },
+  });
+
+  if (!event) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
+  let notified = 0;
+  if (notify) {
+    const eventInfo = { title: event.title, date: event.date, location: event.location };
+    const recipients = [
+      ...event.registrations.map((r) => ({ to: r.email, name: r.name })),
+      ...event.waitlist.map((w) => ({ to: w.email, name: w.name })),
+    ];
+    const results = await Promise.allSettled(
+      recipients.map((r) => sendCancellationEmail({ to: r.to, name: r.name, event: eventInfo }))
+    );
+    notified = results.filter((r) => r.status === "fulfilled").length;
+  }
+
   await prisma.event.delete({ where: { id } });
-  return NextResponse.json({ status: "deleted" });
+  return NextResponse.json({ status: "deleted", notified });
 }

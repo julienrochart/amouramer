@@ -210,6 +210,29 @@ export async function sendReminderEmail({
   });
 }
 
+export async function sendCancellationEmail({
+  to,
+  name,
+  event,
+}: {
+  to: string;
+  name: string;
+  event: EventInfo;
+}) {
+  await getResend().emails.send({
+    from,
+    to,
+    subject: `Event cancelled - ${event.title}`,
+    html: `
+      <h2>Hi ${name},</h2>
+      <p>We're sorry to let you know that <strong>${event.title}</strong>, scheduled for ${formatDate(event.date)} at ${event.location}, has been cancelled.</p>
+      <p>We sincerely apologize for the inconvenience.</p>
+      <p>We hope to welcome you at one of our upcoming tastings soon.</p>
+      <p>Amour Amer</p>
+    `,
+  });
+}
+
 export async function sendPostEventEmail({
   to,
   name,

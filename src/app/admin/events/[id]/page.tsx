@@ -42,6 +42,15 @@ export default function AdminEventDetail() {
   const [productForm, setProductForm] = useState({ name: "", description: "", price: "" });
   const [sending, setSending] = useState(false);
   const [sentCount, setSentCount] = useState<number | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({
+    title: "",
+    description: "",
+    date: "",
+    location: "",
+    maxGuests: 20,
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     loadEvent();
@@ -53,9 +62,78 @@ export default function AdminEventDetail() {
   }
 
   async function handleDelete() {
-    if (!confirm("Delete this event?")) return;
-    await adminFetch(`/api/admin/events/${id}`, { method: "DELETE" });
+    if (!event) return;
+
+    const totalRegistered = event.registrations.reduce((sum, r) => sum + r.guests, 0);
+    const waitlistCount = event.waitlist.length;
+    const hasPeople = event.registrations.length > 0 || waitlistCount > 0;
+
+    const confirmMsg = hasPeople
+      ? `Delete "${event.title}"?\n\n${event.registrations.length} registration(s) (${totalRegistered} guest(s)) and ${waitlistCount} waitlist entry/entries will be removed.\n\nThis cannot be undone.`
+      : `Delete "${event.title}"? This cannot be undone.`;
+    if (!confirm(confirmMsg)) return;
+
+    let notify = false;
+    if (hasPeople) {
+      notify = confirm(
+        `Send an apology email to all ${event.registrations.length + waitlistCount} participant(s)?`
+      );
+    }
+
+    const res = await adminFetch(`/api/admin/events/${id}`, {
+      method: "DELETE",
+      body: JSON.stringify({ notify }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(`Failed to delete: ${err.error || res.statusText}`);
+      return;
+    }
+
+    const data = await res.json().catch(() => ({ notified: 0 }));
+    if (notify && data.notified !== undefined) {
+      alert(`Event deleted. Apology email sent to ${data.notified} participant(s).`);
+    }
     router.push("/admin/events");
+  }
+
+  function startEdit() {
+    if (!event) return;
+    const d = new Date(event.date);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    setEditForm({
+      title: event.title,
+      description: event.description ?? "",
+      date: local,
+      location: event.location,
+      maxGuests: event.maxGuests,
+    });
+    setEditing(true);
+  }
+
+  async function handleEdit(e: React.FormEvent) {
+    e.preventDefault();
+    setSavingEdit(true);
+    const res = await adminFetch(`/api/admin/events/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({
+        title: editForm.title,
+        description: editForm.description || null,
+        date: editForm.date,
+        location: editForm.location,
+        maxGuests: editForm.maxGuests,
+      }),
+    });
+    setSavingEdit(false);
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(`Failed to update: ${err.error || res.statusText}`);
+      return;
+    }
+    setEditing(false);
+    loadEvent();
   }
 
   async function addProduct(e: React.FormEvent) {
@@ -138,13 +216,99 @@ export default function AdminEventDetail() {
             )}
           </div>
         </div>
-        <button
-          onClick={handleDelete}
-          className="text-sm text-red-400 hover:text-red-600 transition-colors border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50"
-        >
-          Delete
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={startEdit}
+            className="text-sm text-gray-600 hover:text-wine transition-colors border border-cream-dark rounded-lg px-3 py-1.5 hover:bg-cream"
+          >
+            Edit
+          </button>
+          <button
+            onClick={handleDelete}
+            className="text-sm text-red-400 hover:text-red-600 transition-colors border border-red-200 rounded-lg px-3 py-1.5 hover:bg-red-50"
+          >
+            Delete
+          </button>
+        </div>
       </div>
+
+      {editing && (
+        <form
+          onSubmit={handleEdit}
+          className="bg-white border border-cream-dark rounded-2xl p-8 mb-6 space-y-5"
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
+            <input
+              type="text"
+              required
+              value={editForm.title}
+              onChange={(e) => setEditForm({ ...editForm, title: e.target.value })}
+              className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+            <textarea
+              value={editForm.description}
+              onChange={(e) => setEditForm({ ...editForm, description: e.target.value })}
+              className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
+              rows={2}
+            />
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Date & time</label>
+              <input
+                type="datetime-local"
+                required
+                value={editForm.date}
+                onChange={(e) => setEditForm({ ...editForm, date: e.target.value })}
+                className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Location</label>
+              <input
+                type="text"
+                required
+                value={editForm.location}
+                onChange={(e) => setEditForm({ ...editForm, location: e.target.value })}
+                className="w-full border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">Max guests</label>
+            <input
+              type="number"
+              min={1}
+              required
+              value={editForm.maxGuests}
+              onChange={(e) =>
+                setEditForm({ ...editForm, maxGuests: parseInt(e.target.value) || 1 })
+              }
+              className="w-32 border border-cream-dark rounded-xl px-4 py-3 bg-cream/50 text-gray-900 transition-all"
+            />
+          </div>
+          <div className="flex gap-3">
+            <button
+              type="submit"
+              disabled={savingEdit}
+              className="bg-wine text-white px-8 py-3 rounded-xl font-medium hover:bg-wine-light transition-colors disabled:opacity-50"
+            >
+              {savingEdit ? "Saving..." : "Save changes"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setEditing(false)}
+              className="bg-cream text-gray-600 px-6 py-3 rounded-xl font-medium hover:bg-cream-dark transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {/* Registrations */}
       <section className="bg-white border border-cream-dark rounded-xl p-6 mb-6">
