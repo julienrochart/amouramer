@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Amour Amer - Wine Pairing Events",
-  description: "Discover our wine pairing events",
+  title: "Amour Amer",
+  description: "Discover our upcoming experiences",
 };
 
 export default function RootLayout({
@@ -35,14 +35,9 @@ export default function RootLayout({
               <div className="w-9 h-9 bg-wine rounded-full flex items-center justify-center text-white text-sm font-bold tracking-tight">
                 AA
               </div>
-              <div>
-                <span className="text-lg font-semibold text-wine tracking-tight">
-                  Amour Amer
-                </span>
-                <span className="hidden sm:inline text-xs text-gold ml-2 tracking-widest uppercase">
-                  Wine & Food
-                </span>
-              </div>
+              <span className="text-lg font-semibold text-wine tracking-tight">
+                Amour Amer
+              </span>
             </Link>
           </div>
         </header>
@@ -51,7 +46,7 @@ export default function RootLayout({
 
         <footer className="border-t border-cream-dark py-8 mt-16">
           <div className="max-w-3xl mx-auto px-6 text-center text-sm text-gray-400">
-            Amour Amer &middot; Wine & Food
+            Amour Amer
             <div className="mt-2 text-xs text-gray-300">
               Crafted by{" "}
               <a

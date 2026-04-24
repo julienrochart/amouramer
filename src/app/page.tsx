@@ -16,10 +16,10 @@ export default async function Home() {
     <div className="max-w-3xl mx-auto px-6 py-12">
       <div className="mb-12 text-center">
         <h1 className="text-4xl font-bold text-wine tracking-tight mb-3">
-          Our Tastings
+          Our events
         </h1>
         <p className="text-gray-500 text-lg">
-          Discover our upcoming wine pairing events
+          Discover our upcoming experiences
         </p>
       </div>
 
