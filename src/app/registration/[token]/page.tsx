@@ -25,6 +25,9 @@ export default function EditRegistration() {
   const [saved, setSaved] = useState(false);
   const [cancelled, setCancelled] = useState(false);
   const [error, setError] = useState("");
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   useEffect(() => {
     fetch(`/api/registrations/${token}`)
@@ -75,12 +78,23 @@ export default function EditRegistration() {
     setSaving(false);
   }
 
-  async function handleCancel() {
-    const message = data?.type === "waitlist"
-      ? "Are you sure you want to leave the waitlist?"
-      : "Are you sure you want to cancel your registration?";
-    if (!confirm(message)) return;
-    await fetch(`/api/registrations/${token}`, { method: "DELETE" });
+  function handleCancel() {
+    setCancelError("");
+    setShowCancelModal(true);
+  }
+
+  async function confirmCancel() {
+    setCancelling(true);
+    setCancelError("");
+    const res = await fetch(`/api/registrations/${token}`, { method: "DELETE" });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: "Something went wrong" }));
+      setCancelError(err.error || "Something went wrong");
+      setCancelling(false);
+      return;
+    }
+    setCancelling(false);
+    setShowCancelModal(false);
     setCancelled(true);
   }
 
@@ -125,6 +139,52 @@ export default function EditRegistration() {
             </div>
           )}
         </div>
+
+        {showCancelModal && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+            onClick={() => !cancelling && setShowCancelModal(false)}
+          >
+            <div
+              className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                {data.type === "waitlist" ? "Leave the waitlist?" : "Cancel your registration?"}
+              </h2>
+              <p className="text-sm text-gray-600 mb-4">
+                {data.type === "waitlist"
+                  ? "You will be removed from the waitlist. You can sign up again later if spots are still available."
+                  : "Your registration will be cancelled. This cannot be undone."}
+              </p>
+
+              {cancelError && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-xl px-4 py-3 mb-4">
+                  {cancelError}
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowCancelModal(false)}
+                  disabled={cancelling}
+                  className="bg-cream text-gray-600 px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-cream-dark transition-colors disabled:opacity-50"
+                >
+                  Keep it
+                </button>
+                <button
+                  type="button"
+                  onClick={confirmCancel}
+                  disabled={cancelling}
+                  className="bg-red-600 text-white px-5 py-2.5 rounded-xl text-sm font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {cancelling ? "..." : data.type === "waitlist" ? "Leave" : "Cancel registration"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {data.type === "registration" && (
           <form onSubmit={handleSave} className="space-y-5">
