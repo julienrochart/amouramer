@@ -57,6 +57,7 @@ export default async function Home() {
                           month: "long",
                           hour: "2-digit",
                           minute: "2-digit",
+                          timeZone: "Europe/Amsterdam",
                         })}
                       </span>
                       <span className="text-sm text-gray-400 flex items-center gap-1.5">

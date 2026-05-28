@@ -164,6 +164,7 @@ export default function AdminEvents() {
                       month: "short",
                       hour: "2-digit",
                       minute: "2-digit",
+                      timeZone: "Europe/Amsterdam",
                     })}
                     {" — "}
                     {event.location}

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAuthorized } from "@/lib/auth";
 import { sendCancellationEmail } from "@/lib/email";
+import { parseAsAmsterdam } from "@/lib/timezone";
 
 export async function GET(
   request: NextRequest,
@@ -45,7 +46,7 @@ export async function PATCH(
     data: {
       ...(title && { title }),
       ...(description !== undefined && { description }),
-      ...(date && { date: new Date(date) }),
+      ...(date && { date: parseAsAmsterdam(date) }),
       ...(location && { location }),
       ...(maxGuests && { maxGuests }),
     },

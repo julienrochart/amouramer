@@ -98,7 +98,13 @@ export default function AdminEventDetail() {
     if (!event) return;
     const d = new Date(event.date);
     const pad = (n: number) => String(n).padStart(2, "0");
-    const local = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", hour12: false,
+      timeZone: "Europe/Amsterdam",
+    }).formatToParts(d);
+    const get = (type: Intl.DateTimeFormatPartTypes) => parts.find(p => p.type === type)!.value;
+    const local = `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
     setEditForm({
       title: event.title,
       description: event.description ?? "",
@@ -208,6 +214,7 @@ export default function AdminEventDetail() {
                 year: "numeric",
                 hour: "2-digit",
                 minute: "2-digit",
+                timeZone: "Europe/Amsterdam",
               })}
             </span>
             <span className="text-sm text-gray-400">&middot; {event.location}</span>
@@ -478,6 +485,7 @@ export default function AdminEventDetail() {
                     month: "short",
                     hour: "2-digit",
                     minute: "2-digit",
+                    timeZone: "Europe/Amsterdam",
                   })}
                 </span>
               </div>

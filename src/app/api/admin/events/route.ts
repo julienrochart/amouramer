@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { isAuthorized } from "@/lib/auth";
+import { parseAsAmsterdam } from "@/lib/timezone";
 
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
   const { title, description, date, location, maxGuests } = body;
 
   const event = await prisma.event.create({
-    data: { title, description, date: new Date(date), location, maxGuests },
+    data: { title, description, date: parseAsAmsterdam(date), location, maxGuests },
   });
 
   return NextResponse.json(event);
